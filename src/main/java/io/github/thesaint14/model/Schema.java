@@ -1,20 +1,12 @@
 package io.github.thesaint14.model;
+
 import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
+@Getter
+@AllArgsConstructor
 public class Schema {
-    private String name;
-    private List<Field> fields;
-    
-    public Schema(String name, List<Field> fields){
-        this.name = name;
-        this.fields = fields;
-    }
-
-    public String getName() {
-        return name;
-    }
-    public List<Field> getFields() {
-        return fields;
-    }
-
+    private final String name;
+    private final List<Field> fields;
 }

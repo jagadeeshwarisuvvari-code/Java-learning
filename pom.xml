@@ -10,11 +10,12 @@
 
   <name>datanexus</name>
   <!-- FIXME change it to the project's website -->
-  <url>http://www.example.com</url>
+  <url>http://www.lmaothisisnotmakingittoprod.com</url>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.release>25</maven.compiler.release>
+    <lombok.version>1.18.42</lombok.version>
   </properties>
 
 <dependencies>
@@ -34,6 +35,12 @@
         <artifactId>protobuf-java</artifactId>
       </exclusion>
     </exclusions>
+  </dependency>
+  <dependency>
+    <groupId>org.projectlombok</groupId>
+    <artifactId>lombok</artifactId>
+    <version>${lombok.version}</version>
+    <scope>provided</scope>
   </dependency>
 </dependencies>
 
@@ -81,5 +88,21 @@
         </plugin>
       </plugins>
     </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.14.1</version>
+        <configuration>
+          <annotationProcessorPaths>
+            <path>
+              <groupId>org.projectlombok</groupId>
+              <artifactId>lombok</artifactId>
+              <version>${lombok.version}</version>
+            </path>
+          </annotationProcessorPaths>
+        </configuration>
+      </plugin>
+    </plugins>
   </build>
 </project>
