@@ -1,7 +1,7 @@
 package io.github.thesaint14.model;
 
 public enum FieldType {
-    INTERGER,
+    INTEGER,
     LONG,
     DOUBLE,
     BOOLEAN,
