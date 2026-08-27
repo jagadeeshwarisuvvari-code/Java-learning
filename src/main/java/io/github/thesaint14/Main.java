@@ -22,7 +22,7 @@ public class Main {
 
         // --- Parser test ---
         CsvParser parser = new CsvParser();
-        ParsedData result = parser.parse("C:/Users/SAILS-DM301/Downloads/test.csv");
+        ParsedData result = parser.parse(""); //insert yo file path here, it work yayyyy!
 
         System.out.println("Schema: " + result.getSchema());
         for (Record record : result.getRecords()) {
