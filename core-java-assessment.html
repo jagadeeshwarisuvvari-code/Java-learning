@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Core Java Assessment</title>
+<style>
+  :root{
+    --bg: #1b2028;
+    --panel: #232a35;
+    --panel-2: #2a323f;
+    --border: #38414f;
+    --text: #e8ebef;
+    --muted: #9aa5b1;
+    --amber: #d99a4e;
+    --amber-dim: #8a6435;
+    --green: #5cb87a;
+    --orange: #e0a13a;
+    --red: #dd6b5b;
+    --mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(1200px 600px at 15% -10%, #2a3140 0%, transparent 60%),
+      var(--bg);
+    color:var(--text);
+    font-family:var(--sans);
+    min-height:100vh;
+    line-height:1.5;
+  }
+  .wrap{
+    max-width:760px;
+    margin:0 auto;
+    padding:32px 20px 80px;
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:28px;
+    color:var(--muted);
+    font-size:14px;
+  }
+  .brand .cup{font-size:18px;}
+  .brand b{color:var(--text); font-weight:600;}
+
+  .card{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:10px;
+    overflow:hidden;
+  }
+  .editor-bar{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:10px 16px;
+    background:var(--panel-2);
+    border-bottom:1px solid var(--border);
+    font-family:var(--mono);
+    font-size:12.5px;
+    color:var(--muted);
+  }
+  .dot{width:9px;height:9px;border-radius:50%;}
+  .dot.r{background:#e0645a;}
+  .dot.y{background:#e5b95c;}
+  .dot.g{background:#5cb87a;}
+  .editor-path{margin-left:6px;}
+
+  .pad{padding:28px 28px 30px;}
+
+  h1{
+    font-size:26px;
+    margin:0 0 6px;
+    letter-spacing:-0.01em;
+  }
+  .sub{color:var(--muted); font-size:14.5px; margin:0 0 24px;}
+
+  label{
+    display:block;
+    font-size:13px;
+    color:var(--muted);
+    margin:0 0 6px;
+  }
+  input[type=text]{
+    width:100%;
+    background:#161b22;
+    border:1px solid var(--border);
+    color:var(--text);
+    padding:11px 13px;
+    border-radius:7px;
+    font-size:15px;
+    margin-bottom:18px;
+    font-family:var(--sans);
+  }
+  input[type=text]:focus{outline:2px solid var(--amber); outline-offset:1px; border-color:var(--amber);}
+
+  .btn{
+    appearance:none;
+    border:none;
+    cursor:pointer;
+    font-family:var(--sans);
+    font-size:15px;
+    font-weight:600;
+    padding:12px 22px;
+    border-radius:7px;
+    transition:transform .08s ease, background .15s ease;
+  }
+  .btn:active{transform:translateY(1px);}
+  .btn-primary{background:var(--amber); color:#221604;}
+  .btn-primary:hover{background:#e2a75e;}
+  .btn-ghost{background:transparent; color:var(--text); border:1px solid var(--border);}
+  .btn-ghost:hover{border-color:var(--amber);}
+  .btn:disabled{opacity:.4; cursor:not-allowed;}
+  .btn-row{display:flex; gap:10px; margin-top:22px; flex-wrap:wrap;}
+
+  .scope-list{
+    margin:18px 0 26px;
+    padding:16px 18px;
+    background:#161b22;
+    border:1px solid var(--border);
+    border-radius:8px;
+    font-size:13.5px;
+    color:var(--muted);
+  }
+  .scope-list b{color:var(--text);}
+  .scope-list ul{margin:8px 0 0; padding-left:18px;}
+  .scope-list li{margin-bottom:3px;}
+
+  /* Quiz screen */
+  .progress-track{
+    height:6px;
+    background:#161b22;
+    border-radius:4px;
+    overflow:hidden;
+    margin-bottom:22px;
+  }
+  .progress-fill{height:100%; background:var(--amber); transition:width .25s ease;}
+
+  .crumbs{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:8px;
+    font-size:13px;
+    color:var(--muted);
+    margin-bottom:4px;
+  }
+  .crumbs .sep{opacity:.5;}
+  .qcount{font-family:var(--mono); font-size:12.5px; color:var(--muted); margin-bottom:14px;}
+
+  .badge{
+    display:inline-block;
+    padding:2px 10px;
+    border-radius:20px;
+    font-size:12px;
+    font-weight:600;
+    font-family:var(--mono);
+  }
+  .badge-easy{background:rgba(92,184,122,.15); color:var(--green); border:1px solid rgba(92,184,122,.4);}
+  .badge-medium{background:rgba(224,161,58,.15); color:var(--orange); border:1px solid rgba(224,161,58,.4);}
+  .badge-hard{background:rgba(221,107,91,.15); color:var(--red); border:1px solid rgba(221,107,91,.4);}
+
+  .question-text{
+    font-size:18px;
+    margin:16px 0 20px;
+    color:var(--text);
+  }
+
+  .options{display:flex; flex-direction:column; gap:10px; margin-bottom:8px;}
+  .option{
+    display:flex;
+    align-items:flex-start;
+    gap:12px;
+    padding:13px 15px;
+    background:#161b22;
+    border:1px solid var(--border);
+    border-radius:8px;
+    cursor:pointer;
+    font-size:14.5px;
+  }
+  .option:hover{border-color:var(--amber-dim);}
+  .option.selected{border-color:var(--amber); background:rgba(217,154,78,.08);}
+  .option input{margin-top:3px; accent-color:var(--amber);}
+
+  .nav-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-top:26px;
+  }
+  .hint{font-size:12.5px; color:var(--muted);}
+
+  /* Results */
+  .score-hero{
+    text-align:center;
+    padding:10px 0 6px;
+  }
+  .score-num{
+    font-family:var(--mono);
+    font-size:52px;
+    font-weight:700;
+    color:var(--amber);
+    line-height:1;
+  }
+  .score-den{color:var(--muted); font-size:16px; margin-top:4px;}
+  .rating{
+    display:inline-block;
+    margin-top:14px;
+    padding:5px 16px;
+    border-radius:20px;
+    font-size:14px;
+    font-weight:600;
+  }
+
+  .section-title{
+    font-size:14px;
+    text-transform:none;
+    color:var(--muted);
+    margin:30px 0 12px;
+    padding-top:20px;
+    border-top:1px solid var(--border);
+  }
+
+  .topic-row{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:10px 0;
+    font-size:14px;
+  }
+  .topic-name{flex:1; min-width:0;}
+  .topic-bar-track{
+    width:120px;
+    height:7px;
+    background:#161b22;
+    border-radius:4px;
+    overflow:hidden;
+    flex-shrink:0;
+  }
+  .topic-bar-fill{height:100%;}
+  .topic-score{
+    width:44px;
+    text-align:right;
+    font-family:var(--mono);
+    color:var(--muted);
+    font-size:13px;
+    flex-shrink:0;
+  }
+  .focus-flag{
+    font-size:11.5px;
+    color:var(--red);
+    margin-left:8px;
+  }
+
+  .review-item{
+    padding:16px 0;
+    border-top:1px solid var(--border);
+  }
+  .review-q{font-size:15px; margin-bottom:10px;}
+  .review-row{font-size:13.5px; margin-bottom:4px;}
+  .review-row.wrong{color:var(--red);}
+  .review-row.right{color:var(--green);}
+  .review-explain{
+    margin-top:10px;
+    padding:12px 14px;
+    background:#161b22;
+    border-left:3px solid var(--amber);
+    border-radius:4px;
+    font-size:13.5px;
+    color:var(--muted);
+  }
+  .review-explain b{color:var(--text);}
+
+  .id-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:18px;
+    font-size:13px;
+    color:var(--muted);
+    font-family:var(--mono);
+    margin-bottom:6px;
+    padding-bottom:18px;
+    border-bottom:1px solid var(--border);
+  }
+
+  .note-box{
+    margin-top:26px;
+    padding:14px 16px;
+    background:#161b22;
+    border:1px solid var(--border);
+    border-radius:8px;
+    font-size:12.5px;
+    color:var(--muted);
+  }
+  .note-box b{color:var(--text);}
+
+  .hidden{display:none !important;}
+
+  @media print{
+    body{background:#fff; color:#000;}
+    .wrap{max-width:100%;}
+    .no-print{display:none !important;}
+    .card{border:1px solid #ccc;}
+    .editor-bar{background:#eee; color:#333;}
+    input, .option, .topic-bar-track, .review-explain, .note-box, .id-row{
+      background:#fff !important; color:#000 !important; border-color:#ccc !important;
+    }
+    .score-num{color:#000;}
+  }
+
+  @media (max-width:480px){
+    .pad{padding:20px 18px 24px;}
+    .score-num{font-size:42px;}
+    .topic-bar-track{width:70px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="brand no-print"><span class="cup">☕</span><b>Core Java</b>&nbsp;— Intern Assessment</div>
+
+  <!-- START SCREEN -->
+  <div id="screen-start" class="card">
+    <div class="editor-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="editor-path">Assessment.java — setup</span></div>
+    <div class="pad">
+      <h1>Before you begin</h1>
+      <p class="sub">36 questions across 7 Core Java topics. Each subtopic has one easy, one medium, and one hard question. Answer honestly — the report at the end shows exactly what to revisit.</p>
+
+      <label for="inp-name">Full name</label>
+      <input type="text" id="inp-name" placeholder="e.g. Priya Sharma">
+
+      <label for="inp-id">Candidate / intern ID</label>
+      <input type="text" id="inp-id" placeholder="e.g. INT-2026-014">
+
+      <label for="inp-test">Test name</label>
+      <input type="text" id="inp-test" value="Core Java Assessment">
+
+      <div class="scope-list">
+        <b>Topics covered</b>
+        <ul>
+          <li>Object-Oriented Programming — classes &amp; objects, inheritance, polymorphism, encapsulation &amp; abstraction</li>
+          <li>Language Fundamentals — data types &amp; variables, operators &amp; control flow, arrays</li>
+          <li>Strings</li>
+          <li>Exception Handling</li>
+          <li>Collections Framework</li>
+          <li>Multithreading</li>
+          <li>Java 8 Features — lambdas &amp; streams</li>
+        </ul>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="startQuiz()">Start assessment</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUIZ SCREEN -->
+  <div id="screen-quiz" class="card hidden">
+    <div class="editor-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="editor-path" id="quiz-path">Assessment.java</span></div>
+    <div class="pad">
+      <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+      <div class="crumbs">
+        <span id="crumb-topic"></span><span class="sep">/</span><span id="crumb-subtopic"></span>
+        <span id="crumb-diff"></span>
+      </div>
+      <div class="qcount" id="qcount"></div>
+
+      <div class="question-text" id="question-text"></div>
+      <div class="options" id="options"></div>
+
+      <div class="nav-row">
+        <span class="hint" id="nav-hint">Select an answer to continue</span>
+        <div style="display:flex; gap:10px;">
+          <button class="btn btn-ghost" id="btn-prev" onclick="prevQuestion()">Back</button>
+          <button class="btn btn-primary" id="btn-next" onclick="nextQuestion()" disabled>Next</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULTS SCREEN -->
+  <div id="screen-results" class="card hidden">
+    <div class="editor-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="editor-path">Report.java — output</span></div>
+    <div class="pad">
+      <div class="id-row">
+        <span id="rep-name"></span>
+        <span id="rep-id"></span>
+        <span id="rep-test"></span>
+        <span id="rep-date"></span>
+      </div>
+
+      <div class="score-hero">
+        <div class="score-num" id="score-num">0/36</div>
+        <div class="score-den" id="score-pct">0%</div>
+        <div class="rating" id="rating-badge">—</div>
+      </div>
+
+      <div class="section-title">Performance by subtopic</div>
+      <div id="topic-breakdown"></div>
+
+      <div class="section-title">Areas to focus on</div>
+      <div id="focus-areas" style="font-size:14px; color:var(--muted);"></div>
+
+      <div class="section-title">Review — questions answered incorrectly</div>
+      <div id="review-list"></div>
+
+      <div class="btn-row no-print">
+        <button class="btn btn-primary" onclick="downloadReport()">Download report (JSON)</button>
+        <button class="btn btn-ghost" onclick="window.print()">Print / save as PDF</button>
+        <button class="btn btn-ghost" onclick="location.reload()">Retake assessment</button>
+      </div>
+
+      <div class="note-box no-print">
+        <b>Saving this result to the repo:</b> a static page can't push commits to GitHub on its own for security reasons. Downloading the report gives you a file named like <code>results_&lt;id&gt;_&lt;date&gt;.json</code> — drop it into the <code>results/</code> folder of this repo and commit it (or have the candidate email/Slack it to whoever manages the repo). If you want this to happen automatically, that needs a small backend or a GitHub Action wired to a form submission — ask if you'd like help setting that up.
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ---------------------------------------------------------
+   QUESTION BANK — 7 topics, 12 subtopics, 3 difficulties each
+--------------------------------------------------------- */
+const QUESTIONS = [
+  // OOP — Classes & Objects
+  {topic:"Object-Oriented Programming", subtopic:"Classes & Objects", difficulty:"Easy",
+   q:"What keyword is used to create an object of a class in Java?",
+   options:["new","class","object","create"], correct:0,
+   explanation:"The `new` keyword allocates memory for the object and invokes the class's constructor to initialize it."},
+  {topic:"Object-Oriented Programming", subtopic:"Classes & Objects", difficulty:"Medium",
+   q:"What is the default value of an uninitialized instance variable of type int?",
+   options:["0","null","1","undefined"], correct:0,
+   explanation:"Numeric instance variables default to 0 automatically; only reference-type fields default to null."},
+  {topic:"Object-Oriented Programming", subtopic:"Classes & Objects", difficulty:"Hard",
+   q:"Which statement about constructors is correct?",
+   options:["A constructor can return a value","A class can define multiple constructors through overloading","Constructors are inherited by subclasses","A constructor's name can differ from the class name"], correct:1,
+   explanation:"Constructor overloading lets a class have several constructors with different parameter lists. Constructors are never inherited and cannot return a value."},
+
+  // OOP — Inheritance
+  {topic:"Object-Oriented Programming", subtopic:"Inheritance", difficulty:"Easy",
+   q:"Which keyword lets one class inherit from another?",
+   options:["implements","extends","inherits","super"], correct:1,
+   explanation:"`extends` is used for class inheritance; `implements` is used when a class adopts an interface."},
+  {topic:"Object-Oriented Programming", subtopic:"Inheritance", difficulty:"Medium",
+   q:"Which statement about Java inheritance is false?",
+   options:["Java supports single inheritance between classes","Java allows a class to directly extend two classes at once","A subclass can access public and protected members of its superclass","Constructors are not inherited"], correct:1,
+   explanation:"Java deliberately disallows a class from extending more than one class, to avoid ambiguity (the diamond problem). Multiple inheritance of behavior is achieved through interfaces instead."},
+  {topic:"Object-Oriented Programming", subtopic:"Inheritance", difficulty:"Hard",
+   q:"If a subclass constructor doesn't explicitly call super(...), what happens?",
+   options:["It always fails to compile","The compiler inserts an implicit call to the superclass's no-argument constructor","The object simply has no superclass fields","The superclass constructor is skipped entirely"], correct:1,
+   explanation:"Java automatically inserts a call to the superclass's no-arg constructor as the first line, unless the superclass has no such constructor available — in which case it's a compile error."},
+
+  // OOP — Polymorphism
+  {topic:"Object-Oriented Programming", subtopic:"Polymorphism", difficulty:"Easy",
+   q:"What is method overloading?",
+   options:["Redefining a method in a subclass","Defining multiple methods with the same name but different parameters in the same class","Giving two methods different names","Making a method static"], correct:1,
+   explanation:"Overloading is compile-time polymorphism: same method name, different parameter lists, within the same class."},
+  {topic:"Object-Oriented Programming", subtopic:"Polymorphism", difficulty:"Medium",
+   q:"What does correctly overriding a method require?",
+   options:["Same name, same parameters, and a compatible (same or covariant) return type","Same name with different parameters","A completely different class hierarchy","The method must be static"], correct:0,
+   explanation:"Overriding requires an identical signature in the subclass, with a return type that is the same or a covariant subtype — this enables runtime polymorphism."},
+  {topic:"Object-Oriented Programming", subtopic:"Polymorphism", difficulty:"Hard",
+   q:"A superclass reference points to a subclass object. Calling an overridden method invokes:",
+   options:["The superclass's version, always","The subclass's version, via dynamic method dispatch","Neither — it's a compile error","Whichever version matches the reference's declared type"], correct:1,
+   explanation:"Java resolves overridden instance methods at runtime based on the actual object type, not the reference type — this is dynamic (virtual) method dispatch."},
+
+  // OOP — Encapsulation & Abstraction
+  {topic:"Object-Oriented Programming", subtopic:"Encapsulation & Abstraction", difficulty:"Easy",
+   q:"Which access modifier restricts a field to only the class it's declared in?",
+   options:["public","protected","private","default"], correct:2,
+   explanation:"`private` members are accessible only within their own class, which is the core mechanism behind encapsulation."},
+  {topic:"Object-Oriented Programming", subtopic:"Encapsulation & Abstraction", difficulty:"Medium",
+   q:"What is the main purpose of abstraction in Java?",
+   options:["Hiding implementation details while exposing essential functionality","Reducing the number of variables in a program","Enabling multiple inheritance","Making all fields private"], correct:0,
+   explanation:"Abstraction lets you expose what an object does through abstract classes or interfaces, without exposing how it does it."},
+  {topic:"Object-Oriented Programming", subtopic:"Encapsulation & Abstraction", difficulty:"Hard",
+   q:"Which statement about abstract classes is true?",
+   options:["They can be instantiated directly with `new`","They can contain both abstract and fully implemented methods","They cannot declare constructors","They cannot have instance variables"], correct:1,
+   explanation:"An abstract class can mix abstract methods (no body) with concrete ones, and it can have a constructor — invoked when a subclass object is created — even though it can't be instantiated on its own."},
+
+  // Fundamentals — Data Types & Variables
+  {topic:"Language Fundamentals", subtopic:"Data Types & Variables", difficulty:"Easy",
+   q:"Which of these is a primitive data type in Java?",
+   options:["String","Integer","int","ArrayList"], correct:2,
+   explanation:"`int` is primitive. `String`, `Integer`, and `ArrayList` are all reference (object) types."},
+  {topic:"Language Fundamentals", subtopic:"Data Types & Variables", difficulty:"Medium",
+   q:"How many bytes does a `long` occupy in Java?",
+   options:["4 bytes","8 bytes","2 bytes","16 bytes"], correct:1,
+   explanation:"`long` is a 64-bit signed integer type, occupying 8 bytes."},
+  {topic:"Language Fundamentals", subtopic:"Data Types & Variables", difficulty:"Hard",
+   q:"What happens when you assign a `double` to a `float` variable without a cast?",
+   options:["It compiles fine via implicit widening","Compile-time error, since precision may be lost","It throws a runtime exception","It silently rounds to the nearest int"], correct:1,
+   explanation:"double → float is a narrowing conversion (potential precision loss), so Java requires an explicit cast, e.g. `float f = (float) d;`."},
+
+  // Fundamentals — Operators & Control Flow
+  {topic:"Language Fundamentals", subtopic:"Operators & Control Flow", difficulty:"Easy",
+   q:"Which operator compares primitive values for equality?",
+   options:["=","==","equals()","==="], correct:1,
+   explanation:"`==` compares primitive values directly. For objects it compares references, which is why `.equals()` is used for content comparison."},
+  {topic:"Language Fundamentals", subtopic:"Operators & Control Flow", difficulty:"Medium",
+   q:"What does 'fall-through' mean in a `switch` statement?",
+   options:["The switch exits automatically after one case","Execution continues into the next case when `break` is omitted","It only happens with String switches","It causes a compile-time error"], correct:1,
+   explanation:"Without a `break`, control flows into the next case block regardless of whether its label matches, continuing until a `break` or the end of the switch."},
+  {topic:"Language Fundamentals", subtopic:"Operators & Control Flow", difficulty:"Hard",
+   q:"For the ternary expression `cond ? x : y`, how is the result type determined?",
+   options:["It is always boolean","By Java's type promotion/inference rules applied to the types of x and y","It is always Object","It's a compile error if x and y have different types"], correct:1,
+   explanation:"The compiler applies binary numeric promotion and type-inference rules to the two branch expressions to determine the overall type — it isn't automatically Object or an error just because the types differ."},
+
+  // Fundamentals — Arrays
+  {topic:"Language Fundamentals", subtopic:"Arrays", difficulty:"Easy",
+   q:"Which is valid syntax to declare and create an array of 5 ints?",
+   options:["int[] arr = new int[5];","array int arr(5);","int[5] arr;","new int arr[5];"], correct:0,
+   explanation:"`int[] arr = new int[5];` (or the equivalent `int arr[] = new int[5];`) correctly declares and instantiates the array."},
+  {topic:"Language Fundamentals", subtopic:"Arrays", difficulty:"Medium",
+   q:"What is the default value of elements in a newly created boolean array?",
+   options:["true","false","null","0"], correct:1,
+   explanation:"Elements of a `boolean[]` default to `false` when the array is allocated."},
+  {topic:"Language Fundamentals", subtopic:"Arrays", difficulty:"Hard",
+   q:"Which exception is thrown when you access an array index outside its valid range?",
+   options:["NullPointerException","ArrayIndexOutOfBoundsException","IllegalArgumentException","ArrayStoreException"], correct:1,
+   explanation:"Accessing a negative index or one ≥ the array's length throws `ArrayIndexOutOfBoundsException` at runtime."},
+
+  // Strings
+  {topic:"Strings", subtopic:"Strings", difficulty:"Easy",
+   q:"Are String objects in Java mutable or immutable?",
+   options:["Mutable","Immutable","Mutable only inside loops","Depends on the JVM"], correct:1,
+   explanation:"Once created, a String's contents cannot change; any 'modification' actually produces a new String object."},
+  {topic:"Strings", subtopic:"Strings", difficulty:"Medium",
+   q:"What's the difference between `==` and `.equals()` for Strings?",
+   options:["There is no difference","`==` compares references, `.equals()` compares character content","`.equals()` compares references, `==` compares content","Both always return the same result"], correct:1,
+   explanation:"`==` checks whether two variables point to the exact same object in memory, while `.equals()` checks whether the character sequences are logically equal."},
+  {topic:"Strings", subtopic:"Strings", difficulty:"Hard",
+   q:"Which class is best suited for building a String through many concatenations in a loop?",
+   options:["String","StringBuilder","Integer","Character"], correct:1,
+   explanation:"`StringBuilder` is mutable, so repeated appends modify one buffer instead of creating a new String object each time — far more efficient than concatenating with `String` in a loop."},
+
+  // Exception Handling
+  {topic:"Exception Handling", subtopic:"Exception Handling", difficulty:"Easy",
+   q:"Which construct is used to catch and handle exceptions?",
+   options:["try-catch","if-else","for-each","switch-case"], correct:0,
+   explanation:"Code that might throw is placed in a `try` block, and a matching `catch` block handles the exception."},
+  {topic:"Exception Handling", subtopic:"Exception Handling", difficulty:"Medium",
+   q:"What distinguishes checked exceptions from unchecked exceptions?",
+   options:["Checked exceptions extend RuntimeException","Checked exceptions must be caught or declared with `throws`; unchecked ones are not enforced at compile time","Unchecked exceptions must be declared with `throws`","There is no real difference"], correct:1,
+   explanation:"Checked exceptions (subclasses of Exception, excluding RuntimeException) are verified by the compiler. Unchecked exceptions (RuntimeException and its subclasses) aren't required to be declared or caught."},
+  {topic:"Exception Handling", subtopic:"Exception Handling", difficulty:"Hard",
+   q:"In which situation does a `finally` block NOT execute?",
+   options:["Whenever an exception is thrown in try","When `System.exit()` is called inside try/catch, or the JVM crashes first","When no exception occurs","It always executes, no exceptions"], correct:1,
+   explanation:"`finally` runs in nearly every case, but it's skipped if the JVM is terminated abruptly — for example via `System.exit()` — before control reaches it."},
+
+  // Collections Framework
+  {topic:"Collections Framework", subtopic:"Collections Framework", difficulty:"Easy",
+   q:"Which interface represents a collection that does not allow duplicate elements?",
+   options:["List","Set","Map","Queue"], correct:1,
+   explanation:"`Set` enforces uniqueness — attempting to add a duplicate element has no effect."},
+  {topic:"Collections Framework", subtopic:"Collections Framework", difficulty:"Medium",
+   q:"What's a key structural difference between `ArrayList` and `LinkedList`?",
+   options:["ArrayList is backed by a dynamic array; LinkedList is backed by a doubly linked list","LinkedList is always faster in every scenario","ArrayList cannot store null values","There is no real difference"], correct:0,
+   explanation:"`ArrayList` gives fast, constant-time random access because it's array-backed; `LinkedList` gives faster insertions/removals at the ends but slower random access since it must traverse nodes."},
+  {topic:"Collections Framework", subtopic:"Collections Framework", difficulty:"Hard",
+   q:"Why must a custom object override both `equals()` and `hashCode()` to work correctly as a HashMap key?",
+   options:["Only `equals()` matters for HashMap lookups","HashMap uses hashCode() to find the right bucket and equals() to confirm a true match; overriding only one breaks the contract","hashCode() is ignored by HashMap since Java 8","HashMap doesn't rely on either method"], correct:1,
+   explanation:"HashMap first uses `hashCode()` to locate a bucket, then `equals()` to verify the key inside that bucket truly matches. Overriding one without the other causes keys to be 'lost' or duplicated."},
+
+  // Multithreading
+  {topic:"Multithreading", subtopic:"Multithreading", difficulty:"Easy",
+   q:"Which method actually starts a new thread of execution?",
+   options:["run()","start()","execute()","init()"], correct:1,
+   explanation:"`start()` creates a new call stack and has the JVM invoke `run()` on a separate thread; calling `run()` directly just runs it on the current thread like a normal method."},
+  {topic:"Multithreading", subtopic:"Multithreading", difficulty:"Medium",
+   q:"What does the `synchronized` keyword primarily help prevent?",
+   options:["Memory leaks","Race conditions, by letting only one thread execute a block/method at a time","Deadlocks, completely","Compilation errors"], correct:1,
+   explanation:"`synchronized` enforces mutual exclusion on a critical section, preventing race conditions when multiple threads access shared state — though misuse can still introduce deadlocks."},
+  {topic:"Multithreading", subtopic:"Multithreading", difficulty:"Hard",
+   q:"What can happen when multiple threads acquire the same locks in inconsistent order?",
+   options:["Improved throughput","Deadlock","Guaranteed thread safety","Automatic lock release"], correct:1,
+   explanation:"Acquiring locks in different orders across threads can create a circular wait, where each thread holds a lock the other needs — resulting in deadlock."},
+
+  // Java 8 Features
+  {topic:"Java 8 Features", subtopic:"Lambda & Streams", difficulty:"Easy",
+   q:"What do lambda expressions primarily provide a concise syntax for?",
+   options:["Implementing a functional interface","Declaring new classes","Creating arrays","Throwing exceptions"], correct:0,
+   explanation:"A lambda is shorthand for implementing a functional interface (an interface with exactly one abstract method), like `Runnable` or `Comparator`."},
+  {topic:"Java 8 Features", subtopic:"Lambda & Streams", difficulty:"Medium",
+   q:"Which of these Stream operations is a terminal operation?",
+   options:["filter()","map()","collect()","sorted()"], correct:2,
+   explanation:"`collect()` triggers execution of the pipeline and produces a result, ending the stream. `filter`, `map`, and `sorted` are lazy intermediate operations."},
+  {topic:"Java 8 Features", subtopic:"Lambda & Streams", difficulty:"Hard",
+   q:"What happens if you try to reuse a Stream after a terminal operation has already run on it?",
+   options:["It resets and can be reused freely","It throws IllegalStateException, since streams can't be reused","It silently returns cached results","It works exactly as expected"], correct:1,
+   explanation:"Once a terminal operation consumes a stream, that stream instance is closed. Any further operation on it throws `IllegalStateException`."}
+];
+
+/* ---------------------------------------------------------
+   STATE
+--------------------------------------------------------- */
+let candidate = {name:"", id:"", test:""};
+let current = 0;
+let answers = new Array(QUESTIONS.length).fill(null);
+
+function el(id){ return document.getElementById(id); }
+
+function startQuiz(){
+  const name = el('inp-name').value.trim();
+  const id = el('inp-id').value.trim();
+  const test = el('inp-test').value.trim() || "Core Java Assessment";
+  if(!name || !id){
+    alert("Please enter your name and candidate ID before starting.");
+    return;
+  }
+  candidate = {name, id, test};
+  el('screen-start').classList.add('hidden');
+  el('screen-quiz').classList.remove('hidden');
+  renderQuestion();
+}
+
+function renderQuestion(){
+  const q = QUESTIONS[current];
+  el('progress-fill').style.width = ((current) / QUESTIONS.length * 100) + "%";
+  el('crumb-topic').textContent = q.topic;
+  el('crumb-subtopic').textContent = q.subtopic;
+  const diffClass = q.difficulty === "Easy" ? "badge-easy" : q.difficulty === "Medium" ? "badge-medium" : "badge-hard";
+  el('crumb-diff').innerHTML = `<span class="badge ${diffClass}">${q.difficulty}</span>`;
+  el('qcount').textContent = `Question ${current+1} of ${QUESTIONS.length}`;
+  el('question-text').textContent = q.q;
+
+  const optWrap = el('options');
+  optWrap.innerHTML = "";
+  q.options.forEach((opt, i) => {
+    const div = document.createElement('label');
+    div.className = 'option' + (answers[current]===i ? ' selected' : '');
+    div.innerHTML = `<input type="radio" name="opt" ${answers[current]===i?'checked':''}> <span>${opt}</span>`;
+    div.onclick = () => selectOption(i);
+    optWrap.appendChild(div);
+  });
+
+  el('btn-prev').style.visibility = current===0 ? 'hidden' : 'visible';
+  el('btn-next').disabled = answers[current]===null;
+  el('btn-next').textContent = current === QUESTIONS.length-1 ? "Submit assessment" : "Next";
+  el('nav-hint').textContent = answers[current]===null ? "Select an answer to continue" : "";
+}
+
+function selectOption(i){
+  answers[current] = i;
+  renderQuestion();
+}
+
+function nextQuestion(){
+  if(answers[current]===null) return;
+  if(current === QUESTIONS.length-1){
+    submitQuiz();
+    return;
+  }
+  current++;
+  renderQuestion();
+}
+
+function prevQuestion(){
+  if(current===0) return;
+  current--;
+  renderQuestion();
+}
+
+/* ---------------------------------------------------------
+   SCORING + REPORT
+--------------------------------------------------------- */
+let lastReport = null;
+
+function submitQuiz(){
+  const total = QUESTIONS.length;
+  let correctCount = 0;
+  const bySubtopic = {};
+  const wrongList = [];
+
+  QUESTIONS.forEach((q, i) => {
+    if(!bySubtopic[q.subtopic]) bySubtopic[q.subtopic] = {topic:q.topic, correct:0, total:0};
+    bySubtopic[q.subtopic].total++;
+    const isCorrect = answers[i] === q.correct;
+    if(isCorrect){
+      correctCount++;
+      bySubtopic[q.subtopic].correct++;
+    } else {
+      wrongList.push({
+        question: q.q,
+        yourAnswer: answers[i]===null ? "Not answered" : q.options[answers[i]],
+        correctAnswer: q.options[q.correct],
+        explanation: q.explanation,
+        topic: q.topic,
+        subtopic: q.subtopic,
+        difficulty: q.difficulty
+      });
+    }
+  });
+
+  const pct = Math.round((correctCount/total)*100);
+  let rating, ratingColor;
+  if(pct >= 85){ rating = "Excellent"; ratingColor = "var(--green)"; }
+  else if(pct >= 70){ rating = "Good"; ratingColor = "var(--amber)"; }
+  else if(pct >= 50){ rating = "Fair — needs practice"; ratingColor = "var(--orange)"; }
+  else { rating = "Needs significant improvement"; ratingColor = "var(--red)"; }
+
+  const focusAreas = Object.entries(bySubtopic)
+    .filter(([_, v]) => v.correct <= 1)
+    .map(([name, v]) => ({subtopic:name, topic:v.topic, score:`${v.correct}/${v.total}`}));
+
+  const dateStr = new Date().toISOString().slice(0,10);
+
+  lastReport = {
+    candidateName: candidate.name,
+    candidateId: candidate.id,
+    test: candidate.test,
+    date: dateStr,
+    score: correctCount,
+    totalQuestions: total,
+    percentage: pct,
+    performanceRating: rating,
+    subtopicBreakdown: bySubtopic,
+    focusAreas: focusAreas,
+    incorrectAnswers: wrongList
+  };
+
+  renderResults(dateStr, pct, rating, ratingColor, bySubtopic, focusAreas, wrongList, correctCount, total);
+
+  el('screen-quiz').classList.add('hidden');
+  el('screen-results').classList.remove('hidden');
+  window.scrollTo(0,0);
+}
+
+function renderResults(dateStr, pct, rating, ratingColor, bySubtopic, focusAreas, wrongList, correctCount, total){
+  el('rep-name').textContent = "Name: " + candidate.name;
+  el('rep-id').textContent = "ID: " + candidate.id;
+  el('rep-test').textContent = "Test: " + candidate.test;
+  el('rep-date').textContent = "Date: " + dateStr;
+
+  el('score-num').textContent = `${correctCount}/${total}`;
+  el('score-pct').textContent = `${pct}%`;
+  const rb = el('rating-badge');
+  rb.textContent = rating;
+  rb.style.background = ratingColor.replace('var(', 'rgba(').includes('rgba') ? '' : '';
+  rb.style.color = "#141821";
+  rb.style.background = ratingColor === "var(--green)" ? "#5cb87a" : ratingColor === "var(--amber)" ? "#d99a4e" : ratingColor === "var(--orange)" ? "#e0a13a" : "#dd6b5b";
+
+  const bd = el('topic-breakdown');
+  bd.innerHTML = "";
+  Object.entries(bySubtopic).forEach(([name, v]) => {
+    const p = Math.round((v.correct/v.total)*100);
+    const barColor = v.correct === v.total ? "#5cb87a" : v.correct === 0 ? "#dd6b5b" : "#e0a13a";
+    const row = document.createElement('div');
+    row.className = 'topic-row';
+    row.innerHTML = `
+      <div class="topic-name">${name} <span style="color:var(--muted); font-size:12px;">(${v.topic})</span></div>
+      <div class="topic-bar-track"><div class="topic-bar-fill" style="width:${p}%; background:${barColor};"></div></div>
+      <div class="topic-score">${v.correct}/${v.total}</div>
+    `;
+    bd.appendChild(row);
+  });
+
+  const fa = el('focus-areas');
+  if(focusAreas.length === 0){
+    fa.innerHTML = "No major weak areas — solid, consistent performance across subtopics.";
+  } else {
+    fa.innerHTML = "<ul style='margin:0; padding-left:18px;'>" +
+      focusAreas.map(f => `<li style="margin-bottom:6px;"><b style="color:var(--text);">${f.subtopic}</b> (${f.topic}) — scored ${f.score}. Recommend revisiting this subtopic.</li>`).join("") +
+      "</ul>";
+  }
+
+  const rl = el('review-list');
+  if(wrongList.length === 0){
+    rl.innerHTML = "<p style='color:var(--muted); padding-top:16px;'>All answers were correct — nothing to review.</p>";
+  } else {
+    rl.innerHTML = "";
+    wrongList.forEach(w => {
+      const diffClass = w.difficulty === "Easy" ? "badge-easy" : w.difficulty === "Medium" ? "badge-medium" : "badge-hard";
+      const item = document.createElement('div');
+      item.className = 'review-item';
+      item.innerHTML = `
+        <div class="crumbs">${w.topic} <span class="sep">/</span> ${w.subtopic} <span class="badge ${diffClass}">${w.difficulty}</span></div>
+        <div class="review-q">${w.question}</div>
+        <div class="review-row wrong">Your answer: ${w.yourAnswer}</div>
+        <div class="review-row right">Correct answer: ${w.correctAnswer}</div>
+        <div class="review-explain"><b>Why:</b> ${w.explanation}<br><b>Focus on:</b> ${w.subtopic}</div>
+      `;
+      rl.appendChild(item);
+    });
+  }
+}
+
+function downloadReport(){
+  if(!lastReport) return;
+  const filename = `results_${candidate.id.replace(/[^a-z0-9_-]/gi,'_')}_${lastReport.date}.json`;
+  const blob = new Blob([JSON.stringify(lastReport, null, 2)], {type:"application/json"});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+</script>
+</body>
+</html>
