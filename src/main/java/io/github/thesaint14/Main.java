@@ -1,12 +1,14 @@
 package io.github.thesaint14;
 
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
 import io.github.thesaint14.inference.TypeInferer;
 import io.github.thesaint14.model.Record;
-import io.github.thesaint14.parser.CsvParser;
+import io.github.thesaint14.parser.DirectoryIngestor;
+import io.github.thesaint14.parser.IngestResult;
 import io.github.thesaint14.parser.ParsedData;
 
 public class Main {
@@ -21,15 +23,20 @@ public class Main {
             System.out.println("Connection Failed!" + e.getMessage());
         }
 
-        // --- Parser test ---
-        CsvParser parser = new CsvParser();
-        ParsedData result = parser.parse(""); //insert yo file path here, it work yayyyy!
-        ParsedData inferred = new TypeInferer().infer(result);
+Path directory = Path.of(""); //folder path here
+    for (IngestResult ingestResult : new DirectoryIngestor().ingest(directory)) {
+        if (!ingestResult.isSuccess()) {
+            System.out.println("Failed: "+ingestResult.getFile()+ "-" + ingestResult.getError().getMessage());
+            continue;
+        }
 
-        System.out.println("Schema: " + inferred.getSchema());
+        ParsedData inferred = new TypeInferer().infer(ingestResult.getData());
+        System.out.println("Schema: " +inferred.getSchema());
         for (Record record : inferred.getRecords()) {
             System.out.println("Values: " + record.getValues());
             System.out.println("Padded: " + record.getPaddedFields());
         }
     }
+    }
+
 }

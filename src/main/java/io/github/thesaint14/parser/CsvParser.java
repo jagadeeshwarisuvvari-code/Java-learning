@@ -10,10 +10,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import io.github.thesaint14.exception.EmptyFileException;
+import io.github.thesaint14.exception.MalformedRowException;
+import io.github.thesaint14.exception.UnsupportedFileTypeException;
 import io.github.thesaint14.model.Field;
 import io.github.thesaint14.model.FieldType;
 import io.github.thesaint14.model.Record;
 import io.github.thesaint14.model.Schema;
+
 
 public class CsvParser {
 
@@ -24,10 +28,10 @@ public class CsvParser {
         } else if (filePath.toLowerCase().endsWith(".tsv") || filePath.toLowerCase().endsWith(".txt")) {
             delimiter = "\t";
         } else {
-            throw new IllegalArgumentException("Unsupported file format. Only CSV and TSV files work for now lol");
+            throw new UnsupportedFileTypeException(filePath);
         }
         List<String> lines = Files.readAllLines(Path.of(filePath));
-        verifyStructure(lines, delimiter);
+        verifyStructure(lines, delimiter, filePath);
 
         String header = lines.get(0);
         List<String> dataLines = lines.subList(1, lines.size());
@@ -43,18 +47,16 @@ public class CsvParser {
         return new ParsedData(schema, records);
     }
 
-private void verifyStructure(List<String> lines, String delimiter) {
+private void verifyStructure(List<String> lines, String delimiter, String filePath) {
     if (lines.isEmpty()) {
-        throw new IllegalArgumentException("File is empty");
+        throw new EmptyFileException(filePath);
     }
 
     int expectedColumnCount = lines.get(0).split(delimiter, -1).length;
     for (int i = 1; i < lines.size(); i++) {
         String[] values = lines.get(i).split(delimiter, -1);
         if (values.length > expectedColumnCount) {
-            throw new IllegalArgumentException(
-                "Invalid structure at row " + (i + 1) + ": expected " + expectedColumnCount + " columns, but found " + values.length
-            );
+            throw new MalformedRowException(filePath, i + 1, expectedColumnCount, values.length);
         }
     }
 }
